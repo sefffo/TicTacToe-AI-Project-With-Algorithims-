@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe AI Project | Search Algorithms</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header */
+        header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 40px 0;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            border-radius: 15px;
+        }
+
+        header h1 {
+            font-size: 3em;
+            color: #667eea;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        header p {
+            font-size: 1.3em;
+            color: #666;
+        }
+
+        /* Navigation */
+        nav {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 15px 0;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: #667eea;
+            font-weight: 600;
+            padding: 8px 20px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        nav a:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        /* Section Styling */
+        section {
+            background: white;
+            margin-bottom: 30px;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.1);
+        }
+
+        section h2 {
+            font-size: 2.5em;
+            color: #667eea;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+
+        section h3 {
+            font-size: 1.8em;
+            color: #764ba2;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+
+        /* Team Section */
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .team-member {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .team-member:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+
+        .team-member h3 {
+            color: white;
+            font-size: 1.4em;
+            margin: 0 0 10px 0;
+        }
+
+        .team-member p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .member-icon {
+            font-size: 3em;
+            margin-bottom: 15px;
+        }
+
+        /* Code Block Styling */
+        .code-section {
+            margin: 25px 0;
+        }
+
+        .code-title {
+            background: #667eea;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px 8px 0 0;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        pre {
+            margin: 0 !important;
+            border-radius: 0 0 8px 8px !important;
+            max-height: 500px;
+            overflow-y: auto;
+        }
+
+        pre code {
+            font-size: 0.95em;
+        }
+
+        /* Algorithm Cards */
+        .algo-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+
+        .algo-card {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            padding: 30px;
+            border-radius: 15px;
+            color: white;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .algo-card.bfs {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .algo-card.dfs {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .algo-card.astar {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .algo-card h3 {
+            color: white;
+            margin-top: 0;
+            font-size: 2em;
+        }
+
+        .algo-card ul {
+            margin-left: 20px;
+            margin-top: 15px;
+        }
+
+        .algo-card li {
+            margin-bottom: 10px;
+            font-size: 1.05em;
+        }
+
+        /* Feature List */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 25px;
+        }
+
+        .feature {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .feature h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+
+        /* Explanation Box */
+        .explanation {
+            background: #f0f7ff;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .explanation h4 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        /* Board Visual */
+        .board-visual {
+            display: grid;
+            grid-template-columns: repeat(3, 80px);
+            gap: 5px;
+            margin: 20px auto;
+            width: fit-content;
+        }
+
+        .board-cell {
+            width: 80px;
+            height: 80px;
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            border-radius: 8px;
+        }
+
+        /* Scroll Progress Bar */
+        #progress-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 4px;
+            background: #667eea;
+            width: 0%;
+            z-index: 9999;
+            transition: width 0.1s;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+
+            section {
+                padding: 20px;
+            }
+
+            section h2 {
+                font-size: 1.8em;
+            }
+        }
+
+        /* Back to top button */
+        #back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #667eea;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            transition: all 0.3s;
+        }
+
+        #back-to-top:hover {
+            background: #764ba2;
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body>
+    <div id="progress-bar"></div>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>🎮 Tic-Tac-Toe AI Project</h1>
+            <p>Implementation of Search Algorithms: BFS, DFS & A*</p>
+        </header>
+
+        <!-- Navigation -->
+        <nav>
+            <ul>
+                <li><a href="#team">Team Members</a></li>
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#bfs">BFS Algorithm</a></li>
+                <li><a href="#dfs">DFS Algorithm</a></li>
+                <li><a href="#astar">A* Algorithm</a></li>
+                <li><a href="#game">Game Logic</a></li>
+                <li><a href="#demo">Demo</a></li>
+            </ul>
+        </nav>
+
+        <!-- Team Members Section -->
+        <section id="team">
+            <h2>👥 Team Members</h2>
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="member-icon">👨‍💻</div>
+                    <h3>Saif Eldeen Ahmed Lotfy</h3>
+                    <p>ID: 23030241</p>
+                </div>
+                <div class="team-member">
+                    <div class="member-icon">👨‍💻</div>
+                    <h3>Mohamed Waleed Abdelgwad</h3>
+                    <p>ID: 23030176</p>
+                </div>
+                <div class="team-member">
+                    <div class="member-icon">👨‍💻</div>
+                    <h3>Youssef Ahmed Hassan</h3>
+                    <p>ID: 23030218</p>
+                </div>
+                <div class="team-member">
+                    <div class="member-icon">👨‍💻</div>
+                    <h3>Khaled Atef Mahmoud</h3>
+                    <p>ID: 23030064</p>
+                </div>
+                <div class="team-member">
+                    <div class="member-icon">👨‍💻</div>
+                    <h3>Omar Ahmed Omar</h3>
+                    <p>ID: 23030122</p>
+                </div>
+                <div class="team-member">
+                    <div class="member-icon">👨‍💻</div>
+                    <h3>Saeed Mamdouh Mohamed</h3>
+                    <p>ID: 23030086</p>
+                </div>
+                <div class="team-member">
+                    <div class="member-icon">👩‍💻</div>
+                    <h3>Mayada Salah</h3>
+                    <p>ID: 23030198</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Project Overview -->
+        <section id="overview">
+            <h2>📋 Project Overview</h2>
+            <p style="font-size: 1.1em; line-height: 1.8; margin-bottom: 20px;">
+                This project implements a classic Tic-Tac-Toe game where you can play against an AI opponent 
+                that uses different search algorithms. You can choose between <strong>BFS (Breadth-First Search)</strong>, 
+                <strong>DFS (Depth-First Search)</strong>, or <strong>A* (A-Star Search)</strong> to see how 
+                different algorithms approach the same problem.
+            </p>
+
+            <h3>🎯 Key Features</h3>
+            <div class="features">
+                <div class="feature">
+                    <h4>🤖 Three AI Algorithms</h4>
+                    <p>Choose between BFS, DFS, or A* to play against</p>
+                </div>
+                <div class="feature">
+                    <h4>🎨 Simple UI</h4>
+                    <p>Clean Tkinter interface with easy controls</p>
+                </div>
+                <div class="feature">
+                    <h4>🔄 Rematch Option</h4>
+                    <p>Quick rematch with the same algorithm</p>
+                </div>
+                <div class="feature">
+                    <h4>📊 Visual Feedback</h4>
+                    <p>Color-coded moves and game status</p>
+                </div>
+            </div>
+
+            <h3>🎮 Board Structure</h3>
+            <div class="explanation">
+                <h4>How the Board is Represented</h4>
+                <p>The game uses a 1D array with 9 positions (0-8) to represent the 3x3 board:</p>
+            </div>
+            <div class="board-visual">
+                <div class="board-cell">0</div>
+                <div class="board-cell">1</div>
+                <div class="board-cell">2</div>
+                <div class="board-cell">3</div>
+                <div class="board-cell">4</div>
+                <div class="board-cell">5</div>
+                <div class="board-cell">6</div>
+                <div class="board-cell">7</div>
+                <div class="board-cell">8</div>
+            </div>
+        </section>
+
+        <!-- BFS Algorithm -->
+        <section id="bfs">
+            <h2>🔵 BFS Algorithm (Breadth-First Search)</h2>
+
+            <div class="explanation">
+                <h4>What is BFS?</h4>
+                <p>
+                    BFS explores all possibilities at the current level before moving deeper. In Tic-Tac-Toe, 
+                    it checks all 9 positions in order for winning moves, then checks all positions for blocking moves, 
+                    then makes strategic choices.
+                </p>
+            </div>
+
+            <div class="algo-cards">
+                <div class="algo-card bfs">
+                    <h3>How BFS Works</h3>
+                    <ul>
+                        <li><strong>Level 1:</strong> Check positions 0-8 for immediate win</li>
+                        <li><strong>Level 2:</strong> Check positions 0-8 to block player</li>
+                        <li><strong>Level 3:</strong> Take center → corners → edges</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="code-section">
+                <div class="code-title">BFS Implementation</div>
+                <pre><code class="language-python">def bfs(self):
+    """BFS: Check all moves one by one (breadth-first)"""
+
+    # LEVEL 1: Check all positions for immediate win
+    for i in range(9):
+        if self.board[i] == '':
+            self.board[i] = 'O'  # Try AI move
+            if self.is_winner('O'):
+                self.board[i] = ''  # Undo temporary move
+                return i  # Found winning move!
+            self.board[i] = ''  # Not a win, undo
+
+    # LEVEL 2: Check all positions to block player
+    for i in range(9):
+        if self.board[i] == '':
+            self.board[i] = 'X'  # Simulate player move
+            if self.is_winner('X'):
+                self.board[i] = ''  # Undo
+                return i  # Must block here!
+            self.board[i] = ''
+
+    # LEVEL 3: Strategic positioning
+    # Take center if available (most valuable)
+    if self.board[4] == '':
+        return 4
+
+    # Take a corner (second most valuable)
+    for corner in [0, 2, 6, 8]:
+        if self.board[corner] == '':
+            return corner
+
+    # Take any remaining position
+    for i in range(9):
+        if self.board[i] == '':
+            return i</code></pre>
+            </div>
+
+            <div class="explanation">
+                <h4>💡 Key Insight</h4>
+                <p>
+                    BFS explores systematically: it checks <em>all</em> positions at each level before moving 
+                    to the next decision layer. This ensures no winning or blocking opportunity is missed.
+                </p>
+            </div>
+        </section>
+
+        <!-- DFS Algorithm -->
+        <section id="dfs">
+            <h2>🟢 DFS Algorithm (Depth-First Search)</h2>
+
+            <div class="explanation">
+                <h4>What is DFS?</h4>
+                <p>
+                    DFS follows a specific priority path deeply before exploring alternatives. It checks positions 
+                    in a predetermined order: center first, then corners, then edges. This creates a "depth-first" 
+                    exploration pattern.
+                </p>
+            </div>
+
+            <div class="algo-cards">
+                <div class="algo-card dfs">
+                    <h3>How DFS Works</h3>
+                    <ul>
+                        <li><strong>Priority Order:</strong> [4, 0, 2, 6, 8, 1, 3, 5, 7]</li>
+                        <li><strong>Depth 1:</strong> Check priority positions for win</li>
+                        <li><strong>Depth 2:</strong> Check priority positions to block</li>
+                        <li><strong>Depth 3:</strong> Take first available in priority list</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="code-section">
+                <div class="code-title">DFS Implementation</div>
+                <pre><code class="language-python">def dfs(self):
+    """DFS: Check moves with priority (depth-first approach)"""
+
+    # Define priority order: center > corners > edges
+    # This creates the "depth" in depth-first search
+    priority = [4, 0, 2, 6, 8, 1, 3, 5, 7]
+
+    # DEPTH 1: Check priority positions for immediate win
+    for i in priority:
+        if self.board[i] == '':
+            self.board[i] = 'O'
+            if self.is_winner('O'):
+                self.board[i] = ''
+                return i  # Winning move found
+            self.board[i] = ''
+
+    # DEPTH 2: Check priority positions to block player
+    for i in priority:
+        if self.board[i] == '':
+            self.board[i] = 'X'
+            if self.is_winner('X'):
+                self.board[i] = ''
+                return i  # Block this move
+            self.board[i] = ''
+
+    # DEPTH 3: Follow priority order for strategic move
+    for i in priority:
+        if self.board[i] == '':
+            return i  # Take first available priority position</code></pre>
+            </div>
+
+            <div class="explanation">
+                <h4>💡 Key Insight</h4>
+                <p>
+                    DFS differs from BFS by following a specific priority path. Instead of checking positions 0-8 
+                    in order, it checks center (4) first, then corners, then edges. This "depth-first" approach 
+                    prioritizes more strategic positions.
+                </p>
+            </div>
+        </section>
+
+        <!-- A* Algorithm -->
+        <section id="astar">
+            <h2>🟡 A* Algorithm (A-Star Search)</h2>
+
+            <div class="explanation">
+                <h4>What is A*?</h4>
+                <p>
+                    A* is an informed search algorithm that uses a heuristic function to evaluate move quality. 
+                    Each position gets a score based on its strategic value, and the algorithm chooses the 
+                    highest-scoring move. This makes it "smarter" than blind search algorithms.
+                </p>
+            </div>
+
+            <div class="algo-cards">
+                <div class="algo-card astar">
+                    <h3>How A* Works</h3>
+                    <ul>
+                        <li><strong>Heuristic Scoring:</strong></li>
+                        <li>Center (position 4): 4 points</li>
+                        <li>Corners (0,2,6,8): 3 points</li>
+                        <li>Edges (1,3,5,7): 2 points</li>
+                        <li><strong>Always picks highest score</strong></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="code-section">
+                <div class="code-title">A* Implementation</div>
+                <pre><code class="language-python">def astar(self):
+    """A*: Score each move and pick the best"""
+
+    # STEP 1: Check for immediate win (highest priority)
+    for i in range(9):
+        if self.board[i] == '':
+            self.board[i] = 'O'
+            if self.is_winner('O'):
+                self.board[i] = ''
+                return i
+            self.board[i] = ''
+
+    # STEP 2: Check for blocking moves
+    for i in range(9):
+        if self.board[i] == '':
+            self.board[i] = 'X'
+            if self.is_winner('X'):
+                self.board[i] = ''
+                return i
+            self.board[i] = ''
+
+    # STEP 3: Use heuristic scoring
+    scores = []
+
+    # Define heuristic values for each position
+    # Index:  0  1  2  3  4  5  6  7  8
+    # Score:  3  2  3  2  4  2  3  2  3
+    position_value = [3, 2, 3, 2, 4, 2, 3, 2, 3]
+
+    # Calculate score for each empty position
+    for i in range(9):
+        if self.board[i] == '':
+            score = position_value[i]
+            scores.append((score, i))  # (score, position)
+
+    # Sort by score (highest first)
+    if scores:
+        scores.sort(reverse=True)
+        return scores[0][1]  # Return position with highest score</code></pre>
+            </div>
+
+            <div class="explanation">
+                <h4>💡 Key Insight</h4>
+                <p>
+                    A* is "informed" because it uses domain knowledge (the heuristic function). It knows that 
+                    center is worth 4 points because it's part of 4 winning lines, corners are worth 3 points 
+                    (3 winning lines each), and edges are worth 2 points (2 winning lines each).
+                </p>
+            </div>
+        </section>
+
+        <!-- Game Logic -->
+        <section id="game">
+            <h2>⚙️ Core Game Logic</h2>
+
+            <h3>Checking for Winners</h3>
+            <div class="code-section">
+                <div class="code-title">Winner Detection</div>
+                <pre><code class="language-python">def is_winner(self, player):
+    """Check if player has won"""
+
+    # All 8 possible winning combinations
+    wins = [
+        # Rows
+        [0, 1, 2],  # Top row
+        [3, 4, 5],  # Middle row
+        [6, 7, 8],  # Bottom row
+
+        # Columns
+        [0, 3, 6],  # Left column
+        [1, 4, 7],  # Middle column
+        [2, 5, 8],  # Right column
+
+        # Diagonals
+        [0, 4, 8],  # Top-left to bottom-right
+        [2, 4, 6]   # Top-right to bottom-left
+    ]
+
+    # Check each winning combination
+    for combo in wins:
+        # Check if player has all 3 positions in this combo
+        if all(self.board[i] == player for i in combo):
+            return True  # Winner found!
+
+    return False  # No winner yet</code></pre>
+            </div>
+
+            <h3>Player Move Handling</h3>
+            <div class="code-section">
+                <div class="code-title">Player Click Handler</div>
+                <pre><code class="language-python">def player_click(self, pos):
+    """Handles when player clicks a board position"""
+
+    # Check if position is empty and game is active
+    if self.board[pos] == '' and not self.game_over:
+        # Place player's mark
+        self.board[pos] = 'X'
+        self.buttons[pos].config(text='X', fg='blue', state='disabled')
+
+        # Check if game ended
+        if not self.check_end():
+            # Let AI make its move after 300ms delay
+            self.window.after(300, self.ai_turn)</code></pre>
+            </div>
+
+            <h3>AI Decision Making</h3>
+            <div class="code-section">
+                <div class="code-title">AI Turn Logic</div>
+                <pre><code class="language-python">def ai_turn(self):
+    """AI makes a move based on selected algorithm"""
+
+    # Choose algorithm based on user selection
+    if self.algorithm == "BFS":
+        move = self.bfs()
+    elif self.algorithm == "DFS":
+        move = self.dfs()
+    else:  # A*
+        move = self.astar()
+
+    # Make the move if valid
+    if move is not None:
+        self.board[move] = 'O'
+        self.buttons[move].config(text='O', fg='red', state='disabled')
+        self.check_end()</code></pre>
+            </div>
+        </section>
+
+        <!-- Algorithm Comparison -->
+        <section id="demo">
+            <h2>📊 Algorithm Comparison</h2>
+
+            <div class="explanation">
+                <h4>Which Algorithm is Best?</h4>
+                <p style="font-size: 1.1em; line-height: 1.8;">
+                    All three algorithms play optimally for Tic-Tac-Toe, meaning they won't lose if played perfectly. 
+                    However, they differ in their approach:
+                </p>
+            </div>
+
+            <div class="algo-cards">
+                <div class="algo-card bfs">
+                    <h3>BFS</h3>
+                    <p><strong>Pros:</strong></p>
+                    <ul>
+                        <li>Systematic exploration</li>
+                        <li>Never misses opportunities</li>
+                        <li>Simple to understand</li>
+                    </ul>
+                    <p><strong>Cons:</strong></p>
+                    <ul>
+                        <li>Checks all positions even when unnecessary</li>
+                        <li>No strategic prioritization</li>
+                    </ul>
+                </div>
+
+                <div class="algo-card dfs">
+                    <h3>DFS</h3>
+                    <p><strong>Pros:</strong></p>
+                    <ul>
+                        <li>Follows smart priority order</li>
+                        <li>Efficient exploration path</li>
+                        <li>Good strategic positioning</li>
+                    </ul>
+                    <p><strong>Cons:</strong></p>
+                    <ul>
+                        <li>Fixed priority might not always be optimal</li>
+                        <li>Less flexible than A*</li>
+                    </ul>
+                </div>
+
+                <div class="algo-card astar">
+                    <h3>A*</h3>
+                    <p><strong>Pros:</strong></p>
+                    <ul>
+                        <li>Uses informed heuristic</li>
+                        <li>Mathematically optimal</li>
+                        <li>Adapts to board state</li>
+                    </ul>
+                    <p><strong>Cons:</strong></p>
+                    <ul>
+                        <li>Requires good heuristic design</li>
+                        <li>Slightly more complex</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>🎯 How to Run the Game</h3>
+            <div class="explanation">
+                <ol style="font-size: 1.1em; line-height: 2; margin-left: 20px;">
+                    <li>Save the code as <code>simple_tic_tac_toe.py</code></li>
+                    <li>Run: <code>python simple_tic_tac_toe.py</code></li>
+                    <li>Select your AI opponent (BFS, DFS, or A*)</li>
+                    <li>Click any cell to make your move</li>
+                    <li>Watch the AI respond!</li>
+                    <li>Use "Rematch" for quick replay or "New Game" to try different algorithms</li>
+                </ol>
+            </div>
+
+            <h3>🔧 Technologies Used</h3>
+            <div class="features">
+                <div class="feature">
+                    <h4>🐍 Python</h4>
+                    <p>Core programming language</p>
+                </div>
+                <div class="feature">
+                    <h4>🖼️ Tkinter</h4>
+                    <p>GUI framework for interface</p>
+                </div>
+                <div class="feature">
+                    <h4>🧠 Search Algorithms</h4>
+                    <p>BFS, DFS, and A* implementations</p>
+                </div>
+                <div class="feature">
+                    <h4>🎮 Game Theory</h4>
+                    <p>Optimal play strategies</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <section style="text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+            <h2 style="color: white; border-bottom: 3px solid white;">🎉 Thank You!</h2>
+            <p style="font-size: 1.3em; margin-top: 20px;">
+                This project demonstrates practical applications of search algorithms in game AI.
+            </p>
+            <p style="font-size: 1.1em; margin-top: 15px; opacity: 0.9;">
+                Try playing against each algorithm to see how they differ!
+            </p>
+        </section>
+    </div>
+
+    <!-- Back to Top Button -->
+    <div id="back-to-top" onclick="scrollToTop()">↑</div>
+
+    <!-- Prism.js for Syntax Highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+
+    <!-- Custom JavaScript -->
+    <script>
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('nav a').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // Progress bar
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('progress-bar').style.width = scrolled + '%';
+        });
+
+        // Back to top button
+        window.addEventListener('scroll', () => {
+            const backToTop = document.getElementById('back-to-top');
+            if (window.pageYOffset > 300) {
+                backToTop.style.display = 'flex';
+            } else {
+                backToTop.style.display = 'none';
+            }
+        });
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Add animation on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        });
+
+        document.querySelectorAll('section').forEach(section => {
+            section.style.opacity = '0';
+            section.style.transform = 'translateY(20px)';
+            section.style.transition = 'all 0.6s ease-out';
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>
